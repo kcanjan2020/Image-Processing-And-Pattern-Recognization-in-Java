@@ -1,0 +1,4 @@
+INDEX VERSION 1.131+D:\Computer Engineering Note\7th Sem\2. Image Processing And Pattern Recognization\IPPR_Lab_Solution\.metadata\.plugins\org.eclipse.jdt.core
+1865797976.index
+3405086192.index
+620436700.index

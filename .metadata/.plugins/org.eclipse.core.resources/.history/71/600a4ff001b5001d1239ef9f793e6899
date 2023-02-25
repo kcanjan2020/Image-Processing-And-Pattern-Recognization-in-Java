@@ -1,0 +1,290 @@
+import java.io.File;
+import java.io.IOException;
+import java.awt.Color;
+import java.awt.DisplayMode;
+import java.awt.FlowLayout;
+import java.awt.image.BufferedImage;
+import javax.imageio.ImageIO;
+
+import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import java.lang.Math;
+import java.util.Arrays;
+import java.util.stream.Collectors;
+
+public class ConvertToGray {
+	public static void main(String[] args) {
+		  BufferedImage image;
+		  try
+		  {
+			 image=ImageIO.read(new File("D:\\Computer Engineering Note\\7th Sem\\2. Image Processing And Pattern Recognization\\IPPR_Lab_Solution\\Mbappe.jpg"));
+			  System.out.println("Reading Complete");
+			  			  
+		  }
+		  catch(IOException e){
+			  System.out.println("Error:" + e);
+  			  return;
+  			  
+		  }
+	
+		  int[][] g=getpixel(image);
+		  BufferedImage orig=getBIfromarray(g);
+		  Displayimage(orig);
+
+		 
+
+		  int[][] he= Histogramequalization(g);
+		  //int  [][] c=  convolution(g);
+		  //int [][] cl=clip(c);
+		  
+		//threshold the  convulution image
+		    //int av= avg(cl);
+
+		    //int[][] t = threshold(cl,av);
+		  
+		  
+		  //int [][] m=MedianFilter(g, 9);
+		    BufferedImage i =getBIfromarray(he);
+		   Displayimage(i);
+		  Displayimage(i);
+		  		 
+	try {
+		ImageIO.write(image, "jpg",new File("D:\\Computer Engineering Note\\7th Sem\\2. Image Processing And Pattern Recognization\\IPPR_Lab_Solution\\image_greyed.jpg"));
+		System.out.println("writing completed.");
+	}
+	catch(IOException e) {
+		  System.out.println("Error:" + e);
+			  return;
+	  }
+	
+	}
+
+
+ static int[][] getpixel(BufferedImage image) {
+		
+		 int[][] f= new int[image.getWidth()][image.getHeight()];
+			for(int y=0;y<image.getHeight();y++)
+			{
+				for(int x=0;x<image.getWidth();x++)
+				{
+					Color c =new Color(image.getRGB(x, y));
+					int red=(c.getRed());
+					int blue=(c.getBlue());
+					int green=(c.getGreen());
+					
+					f[x][y]=(int) (red+blue+green)/3;
+				
+				}
+			}
+			return f;
+		}
+ 
+ static int[][] threshold(int[][] h, int threshold1 ) {
+		
+	 int[][] f= new int[h.length][h[0].length];
+		for(int x=0;x<h.length;x++)
+		{
+			for(int y=0;y<h[0].length;y++)
+			{
+			
+				if(h[x][y]>threshold1)
+				{
+					f[x][y]=255;
+				}
+				else
+				   f[x][y]=0;
+					
+			}
+		}
+		return f;
+	}
+ static int avg(int[][] h ) {
+		
+	 //int[][] f= new int[h.length][h[0].length];
+	 int sum=0,average=0,i=0;
+		for(int x=0;x<h.length;x++)
+		{
+			for(int y=0;y<h[0].length;y++)
+			{
+			  i++;
+				sum=sum+h[x][y];
+					
+			}
+		}
+		System.out.println(i);
+		System.out.println(sum);
+		average=sum/i;
+		return average;
+	}
+ static int[][] Histogramequalization(int[][] z ) {
+		
+	 //int[][] f= new int[h.length][h[0].length];
+	 int l=256;
+	 int [] h =new int[l];
+	double [] p =new double[l];
+	 double [] s =new double[l];
+	 double sum=0;
+		for(int x=0;x<z.length;x++)
+		{
+			for(int y=0;y<z[0].length;y++)
+			{
+			  h[z[x][y]]++;
+			 	
+			}
+		}
+		for(int x=0;x<l-1;x++)
+		{
+			p[x]= (double) h[x]/(z.length*z[0].length);
+		}
+		
+		
+		for(int k=0;k<l;k++)
+		{
+			sum=0;
+			for(int j=0;j<=k;j++)
+			{
+			  
+			sum=sum+p[j]	;
+			}
+			 s[k]=(l-1)*sum;
+		}
+		for(int x=0;x<z.length;x++)
+		{
+			for(int y=0;y<z[0].length;y++)
+			{
+			  z[x][y]=(int) Math.round(s[z[x][y]]);
+			 	
+			}
+		}
+		
+		return z;
+	}
+ static int[][] clip(int[][] f)
+ {
+	 for(int x=0;x<f.length;x++)
+		{
+			for(int y=0;y<f[0].length;y++)
+			{
+				if(f[x][y]<0)
+				{
+					f[x][y]=0;
+				}
+				if(f[x][y]>255)
+				{
+					f[x][y]=255;
+				}
+			}
+		}
+	 return f;
+ }
+ static int[][] convolution(int[][] f) {
+		double[][] w= {{1.0/9.0,1.0/9.0,1.0/9.0},
+				{1.0/9.0,1.0/9.0,1.0/9.0},
+				{1.0/9.0,1.0/9.0,1.0/9.0}};
+	int a=(w.length-1)/2;
+	int b=(w[0].length-1)/2;
+	int [][] F= new int [f.length][f[0].length];
+	int[][] f_padded=new int[2*a+f.length][2*a+f[0].length];
+		for(int x=0;x<f.length;x++)
+		{
+			for(int y=0;y<f[0].length;y++)
+			{
+			  f_padded[a+x][b+y]=f[x][y];
+			}
+		}
+		
+		for(int x=0;x<F.length;x++)
+		{
+			for(int y=0;y<F[0].length;y++)
+			{
+				for(int s=-a;s<=a;s++)
+					for(int t=-b;t<=b;t++)
+				{
+			 double v=w[s+a][t+b];
+			 F[x][y]= F[x][y]+(int) (v*f_padded[(a+x)-s][(b+y)-t]);
+			}
+		}
+		}
+		
+		return F;
+	}
+ static int[][] MedianFilter(int [][] f, int size)
+ {
+	 int[][] f_hat=new int[f.length][f[0].length];
+	 int a=size/2;
+	 for(int x=a;x<f.length-a;x++)
+		{
+			for(int y=a;y<f[0].length-a;y++)
+			{
+				int[] A=new int [size*size];
+				int count=0;
+				for(int i=x-a;i<=x+a;i++) {
+					for(int j=y-a;j<=y+a;j++) {
+					A[count]=f[i][j];
+				 Arrays.sort(A);
+				 f_hat[x][y]=A[(int) A.length/2];
+					}
+				 }
+			}
+		}
+	 return f_hat;
+ }
+ static int minval(int z[][] ) { 
+	 
+	 //return Arrays.stream(z).flatMapToInt(Arrays::stream).collect(Collectors.summarizingInt(Integer::intValue)).getMin();
+	 	
+	 //	for(int x[]:z) {
+	 		
+	 	//}
+	 
+		int min=255;
+		for(int x=0;x<z.length;x++)
+		{
+			for(int y=0;y<z[0].length;y++)
+			{
+				if(z[x][y]<min)
+			 
+			 	min=z[x][y];
+			}
+		}
+		return min;
+	}
+ static int maxval(int z[][] ) { 
+		int max=0;
+		for(int x=0;x<z.length;x++)
+		{
+			for(int y=0;y<z[0].length;y++)
+			{
+				if(z[x][y]>max)
+			 
+			 	max=z[x][y];
+			}
+		}
+		return max;
+	}
+	 static BufferedImage getBIfromarray(int[][] f) {
+		 BufferedImage img = new BufferedImage(f.length,f[0].length,BufferedImage.TYPE_BYTE_GRAY);
+		 for (int x=0;x<img.getWidth();x++)
+			 for (int y=0;y<img.getHeight();y++) {
+				 Color newColor = new Color(f[x][y],f[x][y],f[x][y]);
+				    img.setRGB(x, y, newColor.getRGB()); 
+			 
+		}
+		 return img;
+	}
+	 static void  Displayimage(BufferedImage b)
+	 {
+	 ImageIcon icon = new ImageIcon(b)	;
+	 JFrame frame=new JFrame();
+	 frame.setLayout(new FlowLayout());
+	 frame.setSize(400,400);
+	 JLabel lbl =new JLabel();
+	 lbl.setIcon(icon);
+	 frame.add(lbl);
+	 frame.setVisible(true);
+	 frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	 }
+	 
+}
